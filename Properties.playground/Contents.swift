@@ -41,9 +41,18 @@ struct LocationTrack {
     
     var locations: [CLLocation]
     
+    
     var length: CLLocationDistance {
+        var x: Double = 0
+        if locations.count > 0 {
+            for i in 0..<locations.count-1 {
+                x = locations[i].distanceFromLocation(locations[i+1])
+            }
+        } else {
+            return 0
+        }
         // this function should sum up all the distances between the locations in the track
-        return 1000.0 // right now it just returns 1000 (in meters, which is one kilometer).
+        return x // right now it just returns 1000 (in meters, which is one kilometer).
     }
     
 }
@@ -52,6 +61,16 @@ struct LocationTrack {
 import XCTest
 
 class LocationTrackTestSuite: XCTestCase {
+    
+    //sf - 37.7749, 122.4194
+    //mor - 37.8349, 122.1297
+    func testLengthOfTrackWithTwoPoints() {
+        let SF = CLLocation(latitude: 37.7749, longitude: 122.4194)
+        let moraga = CLLocation(latitude: 37.8349, longitude: 122.1297)
+        let twoPointsTrack = LocationTrack(locations: [SF, moraga])
+        let distance = twoPointsTrack.length > 15000 && twoPointsTrack.length < 30000
+        XCTAssertTrue(distance, "Two Point (SF to Moraga) should be between 15km and 30km")
+    }
 
     func testLengthOfTrackWithNoPoints() {
         let noPointsTrack = LocationTrack(locations: [])
